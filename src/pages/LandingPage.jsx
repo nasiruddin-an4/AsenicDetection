@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 
-export default function ArsenicDetectLanding({ onNavigateToRegister, onNavigateToLogin }) {
+export default function ArsenicDetectLanding({
+  onNavigateToRegister,
+  onNavigateToLogin,
+}) {
   const [isHovering, setIsHovering] = useState(false);
 
   return (
@@ -19,21 +22,54 @@ export default function ArsenicDetectLanding({ onNavigateToRegister, onNavigateT
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
               ArsenicDetect
             </h1>
-            <p className="text-sm text-gray-600">Image-based Arsenic Detection</p>
+            <p className="text-sm text-gray-600">
+              Image-based Arsenic Detection
+            </p>
           </div>
 
           <nav>
             <ul className="flex space-x-6 text-gray-700 font-medium">
-              <li><a href="#" onClick={(e) => { e.preventDefault(); }} className="hover:text-emerald-600">Home</a></li>
-              <li><button onClick={onNavigateToLogin} className="hover:text-emerald-600 bg-none border-none cursor-pointer">Login</button></li>
-              <li><button onClick={onNavigateToRegister} className="hover:text-emerald-600 bg-none border-none cursor-pointer">Register</button></li>
-              <li><a href="#about" className="hover:text-emerald-600">About</a></li>
-              <li><a href="#contact" className="hover:text-emerald-600">Contact</a></li>
+              <li>
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                  className="hover:text-emerald-600"
+                >
+                  Home
+                </a>
+              </li>
+              <li>
+                <button
+                  onClick={onNavigateToLogin}
+                  className="hover:text-emerald-600 bg-none border-none cursor-pointer"
+                >
+                  Login
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={onNavigateToRegister}
+                  className="hover:text-emerald-600 bg-none border-none cursor-pointer"
+                >
+                  Register
+                </button>
+              </li>
+              <li>
+                <a href="#about" className="hover:text-emerald-600">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="#contact" className="hover:text-emerald-600">
+                  Contact
+                </a>
+              </li>
             </ul>
           </nav>
         </div>
       </header>
-
 
       {/* Hero Section */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 py-20">
@@ -49,25 +85,32 @@ export default function ArsenicDetectLanding({ onNavigateToRegister, onNavigateT
             </h2>
 
             <p className="text-xl text-gray-600">
-              Upload your water sample image and get instant detection using our deep learning model.
+              Upload your water sample image and get instant detection using our
+              deep learning model.
             </p>
 
             <button
               className="group relative w-fit px-8 py-4 bg-gradient-to-r from-blue-500 to-emerald-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all hover:scale-105 active:scale-95 overflow-hidden"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
-              onClick={onNavigateToRegister}
+              onClick={onNavigateToLogin}
             >
               <div className="flex items-center space-x-2">
                 <span>Get Started</span>
                 <svg
-                  className={`w-5 h-5 transition-transform ${isHovering ? "translate-x-1" : ""}`}
+                  className={`w-5 h-5 transition-transform ${
+                    isHovering ? "translate-x-1" : ""
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
                 </svg>
               </div>
             </button>
@@ -103,7 +146,10 @@ export default function ArsenicDetectLanding({ onNavigateToRegister, onNavigateT
       </section>
 
       {/* About Section */}
-      <section id="about" className="relative z-10 bg-white/70 backdrop-blur-md py-20 border-t border-white/20">
+      <section
+        id="about"
+        className="relative z-10 bg-white/70 backdrop-blur-md py-20 border-t border-white/20"
+      >
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-14">
             How It Works
@@ -111,14 +157,35 @@ export default function ArsenicDetectLanding({ onNavigateToRegister, onNavigateT
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: "📸", title: "Capture Image", text: "Take a clean photo of the water test strip." },
-              { icon: "⬆️", title: "Upload Image", text: "Upload safely to our secure server." },
-              { icon: "🧠", title: "AI Analysis", text: "Deep learning model processes the image." },
-              { icon: "📊", title: "Get Results", text: "See accurate arsenic levels instantly." },
+              {
+                icon: "📸",
+                title: "Capture Image",
+                text: "Take a clean photo of the water test strip.",
+              },
+              {
+                icon: "⬆️",
+                title: "Upload Image",
+                text: "Upload safely to our secure server.",
+              },
+              {
+                icon: "🧠",
+                title: "AI Analysis",
+                text: "Deep learning model processes the image.",
+              },
+              {
+                icon: "📊",
+                title: "Get Results",
+                text: "See accurate arsenic levels instantly.",
+              },
             ].map((item, i) => (
-              <div key={i} className="bg-white/80 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition">
+              <div
+                key={i}
+                className="bg-white/80 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition"
+              >
                 <div className="text-5xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900">{item.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {item.title}
+                </h3>
                 <p className="text-gray-600 mt-2">{item.text}</p>
               </div>
             ))}
@@ -159,12 +226,20 @@ export default function ArsenicDetectLanding({ onNavigateToRegister, onNavigateT
       {/* Footer */}
       <footer className="relative z-10 bg-white/80 backdrop-blur-md border-t border-white/20 py-6">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <p className="text-gray-600">© 2025 ArsenicDetect. All rights reserved.</p>
+          <p className="text-gray-600">
+            © 2025 ArsenicDetect. All rights reserved.
+          </p>
 
           <div className="flex space-x-4 text-xl text-gray-700">
-            <a href="#"><i className="fab fa-facebook"></i></a>
-            <a href="#"><i className="fab fa-twitter"></i></a>
-            <a href="#"><i className="fab fa-linkedin"></i></a>
+            <a href="#">
+              <i className="fab fa-facebook"></i>
+            </a>
+            <a href="#">
+              <i className="fab fa-twitter"></i>
+            </a>
+            <a href="#">
+              <i className="fab fa-linkedin"></i>
+            </a>
           </div>
         </div>
       </footer>
