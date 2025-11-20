@@ -4,6 +4,7 @@ import CheckingPage from './pages/CheckingPage';
 import Register from './pages/register';
 import Login from './pages/Login';
 import Detection from './pages/Detection';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -25,7 +26,17 @@ function App() {
   };
 
   const handleNavigateToDetection = () => {
-    setCurrentPage('detection');
+    // Check if user is admin
+    const userEmail = localStorage.getItem("userEmail");
+    if (userEmail === "admin@arsenic.com") {
+      setCurrentPage('admin');
+    } else {
+      setCurrentPage('checking');
+    }
+  };
+
+  const handleNavigateToAdmin = () => {
+    setCurrentPage('admin');
   };
 
   return (
@@ -38,6 +49,8 @@ function App() {
         <Register onBackToHome={handleBackToHome} onNavigateToLogin={handleNavigateToLogin} onNavigateToDetection={handleNavigateToDetection} />
       ) : currentPage === 'login' ? (
         <Login onBackToHome={handleBackToHome} onNavigateToRegister={handleNavigateToRegister} onNavigateToDetection={handleNavigateToDetection} />
+      ) : currentPage === 'admin' ? (
+        <AdminDashboard onBackToHome={handleBackToHome} />
       ) : (
         <Detection onBackToHome={handleBackToHome} />
       )}

@@ -5,13 +5,19 @@ export default function Login({ onBackToHome, onNavigateToRegister, onNavigateTo
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrorMsg("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg("");
+    
     try {
       const response = await fetch(`http://localhost:8000/login?email=${formData.email}&password=${formData.password}`, {
         method: "POST",
@@ -22,12 +28,15 @@ export default function Login({ onBackToHome, onNavigateToRegister, onNavigateTo
         localStorage.setItem("userEmail", data.email);
         localStorage.setItem("userName", data.name);
         localStorage.setItem("userId", data.user_id);
+        localStorage.setItem("isAdmin", data.is_admin || false);
         onNavigateToDetection();
       } else {
-        alert(data.detail || "Login failed");
+        setErrorMsg(data.detail || "Login failed");
       }
     } catch (error) {
-      alert("Error connecting to server");
+      setErrorMsg("Error connecting to server");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -51,6 +60,12 @@ export default function Login({ onBackToHome, onNavigateToRegister, onNavigateTo
         <p className="text-center text-gray-600 mb-8">
           Sign in to your account to continue.
         </p>
+
+        {errorMsg && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {errorMsg}
+          </div>
+        )}
 
         {/* Form */}
         <form className="space-y-6" onSubmit={handleSubmit}>
@@ -82,9 +97,12 @@ export default function Login({ onBackToHome, onNavigateToRegister, onNavigateTo
 
           <button
             type="submit"
-            className="w-full py-4 bg-gradient-to-r from-blue-500 to-emerald-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105"
+            disabled={isLoading}
+            className={`w-full py-4 bg-gradient-to-r from-blue-500 to-emerald-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-105 ${
+              isLoading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

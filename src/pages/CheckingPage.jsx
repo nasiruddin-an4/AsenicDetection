@@ -10,21 +10,41 @@ export default function CheckingPage({ onBackToHome }) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("analyze");
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
+    // Get user name from localStorage
+    const name = localStorage.getItem("userName");
+    setUserName(name || "User");
     fetchPredictions();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userId");
+    onBackToHome();
+  };
+
   const fetchPredictions = async () => {
     try {
-      const { data, error } = await supabase
-        .from("predictions")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
+      const userId = localStorage.getItem("userId");
+      // Fetch only user's predictions from backend
+      const response = await fetch(`http://localhost:8000/predictions?user_id=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setPredictions(data || []);
+      } else {
+        // Fallback to Supabase if backend fails
+        const { data, error } = await supabase
+          .from("predictions")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(50);
 
-      if (error) throw error;
-      setPredictions(data || []);
+        if (error) throw error;
+        setPredictions(data || []);
+      }
       setError(null);
     } catch (err) {
       console.error("Error fetching predictions:", err);
@@ -69,23 +89,35 @@ export default function CheckingPage({ onBackToHome }) {
     setIsLoading(true);
 
     try {
-      const mockPrediction = Math.random();
-      const result = mockPrediction > 0.5 ? "infected" : "not infected";
-      const confidence =
-        mockPrediction > 0.5 ? mockPrediction : 1 - mockPrediction;
-
-      const { error: insertError } = await supabase.from("predictions").insert({
-        image_path: selectedImage.name,
-        result: result,
-        confidence: confidence,
+      const userId = localStorage.getItem("userId");
+      
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append("file", selectedImage);
+      
+      // Send to backend
+      const response = await fetch(`http://localhost:8000/predict?user_id=${userId}`, {
+        method: "POST",
+        body: formData,
       });
 
-      if (insertError) throw insertError;
+      if (!response.ok) {
+        throw new Error("Prediction failed");
+      }
+
+      const result = await response.json();
+
+      // Store in Supabase as well for backup
+      await supabase.from("predictions").insert({
+        image_path: selectedImage.name,
+        result: result.result,
+        confidence: result.confidence,
+      });
 
       setPrediction({
-        result: result,
-        confidence: confidence,
-        message: `Analysis complete. Plant appears to be ${result}.`,
+        result: result.result,
+        confidence: result.confidence,
+        message: result.message,
       });
 
       fetchPredictions();
@@ -113,6 +145,13 @@ export default function CheckingPage({ onBackToHome }) {
 
   const formatDate = (timestamp) => {
     return new Date(timestamp).toLocaleString();
+  };
+
+  const formatConfidence = (conf) => {
+    // Handle both 0-1 range and percentage range
+    const percentage = typeof conf === 'string' ? parseFloat(conf) : conf;
+    const displayPercent = percentage > 1 ? percentage : percentage * 100;
+    return displayPercent.toFixed(1);
   };
 
   const hasSupabaseConfig =
@@ -150,27 +189,49 @@ export default function CheckingPage({ onBackToHome }) {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                   Toxicity Check
                 </h1>
+                <p className="text-xs text-gray-600">Welcome, {userName}!</p>
               </div>
             </div>
-            <button
-              onClick={onBackToHome}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center space-x-2"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={onBackToHome}
+                className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center space-x-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              <span>Back Home</span>
-            </button>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+                <span>Back Home</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all duration-200 flex items-center space-x-2"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -504,7 +565,7 @@ export default function CheckingPage({ onBackToHome }) {
                                     : "text-yellow-700"
                                 }`}
                               >
-                                {(prediction.confidence * 100).toFixed(1)}%
+                                {formatConfidence(prediction.confidence)}%
                               </span>
                             </div>
                             {prediction.message && (
@@ -676,7 +737,7 @@ export default function CheckingPage({ onBackToHome }) {
                           <div className="mt-2 text-sm text-gray-600">
                             Confidence:{" "}
                             <span className="font-semibold">
-                              {(pred.confidence * 100).toFixed(1)}%
+                              {formatConfidence(pred.confidence)}%
                             </span>
                           </div>
                         )}
